@@ -24,13 +24,22 @@ contract CryptcordTest is Ownable {
     );
 
     // Events
-    event Transfer(address indexed erc20, address indexed from, address indexed to, uint256 value);
+    event Transfer(
+        address indexed erc20,
+        address indexed from,
+        address indexed to,
+        uint256 amount,
+        uint256 fee,
+        uint256 transferAmount,
+        bytes16 paymentId
+    );
 
     function transferTokens(
         address erc20,
         uint256 amount,
         address from,
-        address to
+        address to,
+        bytes16 paymentId
     ) public {
         IERC20 token = IERC20(erc20);
         uint256 fromBalance = token.balanceOf(from);
@@ -68,6 +77,6 @@ contract CryptcordTest is Ownable {
         }
 
         // Event
-        emit Transfer(erc20, from, to, transferAmount);
+        emit Transfer(erc20, from, to, amount, fee, transferAmount, paymentId);
     }
 }
