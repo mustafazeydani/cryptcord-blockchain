@@ -7,6 +7,13 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract CryptcordTest is Ownable {
     constructor() Ownable(msg.sender) {}
 
+    uint256 scaleFactor = 1000;
+    uint256 feePercentage = 75;
+
+    function setFeePercentage(uint256 _feePercentage) external onlyOwner {
+        feePercentage = _feePercentage;
+    }
+
     // Errors
     error InsufficientBalance(uint256 balance, uint256 withdrawAmount);
     error TransferFailed(
@@ -18,22 +25,6 @@ contract CryptcordTest is Ownable {
 
     // Events
     event Transfer(address indexed erc20, address indexed from, address indexed to, uint256 value);
-
-    function calculateFee(uint256 number) internal pure returns (uint256) {
-        uint256 scaleFactor = 1000;
-        uint256 feePercentage = 75; // Represents 7.5%
-        return (number * feePercentage) / scaleFactor;
-    }
-
-    function calculateTransferAmount(uint256 number)
-        internal
-        pure
-        returns (uint256)
-    {
-        uint256 scaleFactor = 1000;
-        uint256 transferPercentage = 925; // Represents 92.5%
-        return (number * transferPercentage) / scaleFactor;
-    }
 
     function transferTokens(
         address erc20,
@@ -53,8 +44,8 @@ contract CryptcordTest is Ownable {
         }
 
         // Calculate the amounts
-        uint256 fee = calculateFee(amount);
-        uint256 transferAmount = calculateTransferAmount(amount);
+        uint256 fee = (amount * feePercentage) / scaleFactor;
+        uint256 transferAmount = amount - fee;
 
         // Transfer the fee to the owner
         if (!token.transferFrom(from, owner(), fee)) {
